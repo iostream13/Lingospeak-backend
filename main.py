@@ -5,13 +5,16 @@ from random import random
 from telnetlib import STATUS
 from typing import List
 
-from fastapi import Depends, FastAPI, Query, Body, status, Form, File, UploadFile, HTTPException, Request
+from fastapi import Depends, FastAPI, Query, Body, status, Form, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Optional, Set
 from pydantic import BaseModel, Field
 from fastapi.responses import JSONResponse, PlainTextResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from sqlalchemy.orm import Session
+from typing import Annotated
+from pydub import AudioSegment
+import speech_recognition as sr
 
 from sql_app import crud, models, schemas
 from sql_app.database import SessionLocal, engine 
@@ -108,15 +111,23 @@ def test_en_vi(sentenceid: int, db: Session = Depends(get_db)):
     word = crud.get_sentence_by_id(db, sentenceid)
     if word is None:
         raise HTTPException(status_code=404, detail="sentence not found")
-    return crud.test_en_to_vi(db, sentenceid)
+    return crud.test_en(db, sentenceid)
 
-@app.get("/test/vi/{sentenceid}")
-def test_vi_en(sentenceid: int, db: Session = Depends(get_db)):
-    word = crud.get_sentence_by_id(db, sentenceid)
-    if word is None:
-        raise HTTPException(status_code=404, detail="sentence not found")
-    return crud.test_vi_to_en(db, sentenceid)
+@app.get("/speak/")
+def speak(text: str, lang: str):
+    crud.SpeakText(text, lang)
+    return "ok"
 
 @app.get("/translate/")
-def test_vi_en(text: str, lang: str):
+def trans(text: str, lang: str):
     return crud.translate_text(text, lang)
+
+# @app.post("/file/")
+# async def convert_audio_to_text(file: UploadFile):
+#     audio = AudioSegment.from_file(file.file, format=file.filename.split(".")[-1])
+#     audio.export("temp.wav", format="wav")
+#     recognizer = sr.Recognizer()
+#     with sr.AudioFile("temp.wav") as source:
+#         audio_data = recognizer.record(source)
+#         text = recognizer.recognize_google(audio_data)
+#     return {"text": text}
