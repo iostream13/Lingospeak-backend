@@ -13,6 +13,7 @@ import random
 import speech_recognition as sr
 import pyttsx3
 import difflib
+import re
 from googletrans import Translator, constants
 from pprint import pprint
 
@@ -24,6 +25,51 @@ translator = Translator()
 from . import models, schemas
 from .models import Gender
 
+def create_user(db: Session, user: schemas.UserCreate):
+    bio = ""
+    if user.bio is not None:
+        bio = user.bio
+    birthday = ""
+    if user.birthday is not None:
+        birthday = user.birthday
+    email = ""
+    if user.email is not None:
+        email = user.email
+    phone = ""
+    if user.phone is not None:
+        phone = user.phone
+    db_user = models.User(username=user.username,
+                          password=user.password, gender=user.gender, birthday=birthday, email=email, phone=phone, bio=bio)
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+def update_user(db: Session, user: schemas.UserCreate):
+    password = ""
+    if user.password is not None:
+        password = user.password
+    gender = ""
+    if user.gender is not None:
+        gender = user.gender
+    bio = ""
+    if user.bio is not None:
+        bio = user.bio
+    birthday = ""
+    if user.birthday is not None:
+        birthday = user.birthday
+    email = ""
+    if user.email is not None:
+        email = user.email
+    phone = ""
+    if user.phone is not None:
+        phone = user.phone
+    db_user = models.User(username=user.username,
+                          password=password, gender=gender, birthday=birthday, email=email, phone=phone, bio=bio)
+    db.query(models.User).filter(models.User.username == user.username).update({"password": password, "gender": gender, 
+                                                                                "birthday": birthday, "email": email, "phone": phone, "bio": bio})
+    db.commit()
+    return db_user
 
 def get_user_by_name(db: Session, user_name: str):
     return db.query(models.User).filter(models.User.username == user_name).first()
@@ -74,27 +120,8 @@ def speech_to_en():
                 recorded_audio, 
                 language="en-US"
             )
-        text = text.lower()
-        print("Did you say ", text)
-        return text
-    except Exception as ex:
-        print(ex)
-        return None
-    return None
-
-def speech_to_vi():
-    with sr.Microphone() as source:
-        recognizer.adjust_for_ambient_noise(source, duration=1)
-        # Recording for 6 seconds
-        print("recording")
-        recorded_audio = recognizer.listen(source, timeout=6)
-        print("Done recording")
-    try:
-        #Recognizing the text
-        text = recognizer.recognize_google (
-                recorded_audio, 
-                language="vi-VN"
-            )
+        if text is None:
+            return None
         text = text.lower()
         print("Did you say ", text)
         return text
@@ -109,11 +136,12 @@ def compare_sentences(text1: str, text2: str):
     d = seq.ratio()
     return d
 
-def test_en(db: Session, sentenceid: int):
+def test_en(db: Session, sentenceid: int, text: str):
     sentence: models.Sentences = get_sentence_by_id(db, sentenceid)
-    text = speech_to_en()
-    word1 = text.lower().split(" ")
-    word2 = sentence.english.lower().split(" ")
+    text1 = re.sub(r'[,.]', '', text)
+    text2 = re.sub(r'[,.]', '', sentence.english)
+    word1 = text1.lower().split(" ")
+    word2 = text2.lower().split(" ")
     words = []
     for i in range(min(len(word1), len(word2))):
         if word1[i] == word2[i]:
@@ -126,7 +154,7 @@ def test_en(db: Session, sentenceid: int):
     else:
         for i in range(len(word2), len(word1)):
             words.append(1)
-    score = compare_sentences(text.lower(), sentence.english.lower())
+    score = compare_sentences(text1.lower(), text2.lower())
     data = {'origin content': sentence.english, 'text': text, 'words': words, 'score': score}
     return data
 
@@ -134,5 +162,51 @@ def translate_text(text: str, lang: str):
     t = translator.translate(text, dest = lang)
     return t.text
     
-    
-        
+def save_test_of_user(db: Session, test: schemas.Test):
+    now = datetime.utcnow()
+    db_order = models.Test(userid = test.userid, timestamp = now, practicedphrases = test.practicedphrases,
+                                   score = test.score, wordmissed = test.wordmissed)
+    db.add(db_order)
+    db.commit()
+    return db_order
+
+def get_history_of_user(db: Session, userid: int):
+    return db.query(models.Test).filter(models.Test.userid == userid).order_by(desc(models.Test.timestamp)).all()
+
+def add_sentences(db: Session, sentence: schemas.Sentences):
+    grade = ""
+    if sentence.grade is not None:
+        grade = sentence.grade
+    unit = ""
+    if sentence.unit is not None:
+        unit = sentence.unit
+    cefr_tags = ""
+    if sentence.cefr_tags is not None:
+        cefr_tags = sentence.cefr_tags
+    domain_tags = ""
+    if sentence.domain_tags is not None:
+        domain_tags = sentence.domain_tags
+    db_sentence = models.Sentences(english = sentence.english, vietnamese = sentence.vietnamese,
+                          grade = grade, unit = unit, cefr_tags = cefr_tags, domain_tags = domain_tags)
+    db.add(db_sentence)
+    db.commit()
+    db.refresh(db_sentence)
+    return db_sentence
+
+def add_word(db: Session, word: schemas.Word):
+    usefrequency = ""
+    if word.usefrequency is not None:
+        usefrequency = word.usefrequency
+    tags = ""
+    if word.tags is not None:
+        tags = word.tags
+    sound = ""
+    if word.sound is not None:
+        sound = word.sound
+    db_word = models.Word(english = word.english, vietnamese = word.vietnamese, pronunciation = word.pronunciation,
+                          sound = sound, usefrequency = usefrequency, tags = tags)
+    db.add(db_word)
+    db.commit()
+    db.refresh(db_word)
+    return db_word
+

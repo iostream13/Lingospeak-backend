@@ -6,7 +6,7 @@ from datetime import datetime, date
 from .models import Gender
 
 class UserCreate(BaseModel):
-    userid: int
+    # userid: int
     username: str
     gender: Gender
     password: str
@@ -19,7 +19,6 @@ class UserCreate(BaseModel):
         orm_mode = True       
         
 class Sentences(BaseModel):
-    sentenceid: int
     english: str 
     vietnamese: str 
     grade: int
@@ -31,7 +30,6 @@ class Sentences(BaseModel):
         orm_mode = True
     
 class Word(BaseModel):
-    wordid: int
     english: str 
     vietnamese: str 
     pronunciation: str 
@@ -43,7 +41,6 @@ class Word(BaseModel):
         orm_mode = True
     
 class Test(BaseModel):
-    testid: int
     userid: int
     timestamp: datetime
     practicedphrases: str 

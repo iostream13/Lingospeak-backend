@@ -50,7 +50,7 @@ def get_db():
 def show():
     return "hello"
 
-@app.post("/usercreate/", response_model=schemas.UserCreate)
+@app.get("/usercreate/", response_model=schemas.UserCreate)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_name(db, user_name=user.username)
     if db_user:
@@ -63,6 +63,14 @@ def read_user(user_name: str, db: Session = Depends(get_db)):
     if user is None:
         raise HTTPException(status_code=404, detail="user not found")
     return user
+
+@app.get("/update_user/", status_code=status.HTTP_201_CREATED)
+def update(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    if crud.get_user_by_name(db, user.username) is None:
+        raise HTTPException(status_code=404, detail="user not found")
+        return None
+    user_update = crud.update_user(db, user)
+    return user_update
 
 @app.get("/sentence/{sentenceid}")
 def sentence_by_id(sentenceid: int, db: Session = Depends(get_db)):
@@ -106,12 +114,22 @@ def word_by_vi(vietnamese: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="word not found")
     return word
 
+@app.get("/say/")
+def say_sth():
+    text = crud.speech_to_en()
+    if text is None:
+        raise HTTPException(status_code=404, detail="voice is Null")
+    return text
+
 @app.get("/test/en/{sentenceid}")
-def test_en_vi(sentenceid: int, db: Session = Depends(get_db)):
-    word = crud.get_sentence_by_id(db, sentenceid)
-    if word is None:
+def test_en(sentenceid: int, db: Session = Depends(get_db)):
+    sentence = crud.get_sentence_by_id(db, sentenceid)
+    if sentence is None:
         raise HTTPException(status_code=404, detail="sentence not found")
-    return crud.test_en(db, sentenceid)
+    text = crud.speech_to_en()
+    if text is None:
+        raise HTTPException(status_code=404, detail="voice is Null")
+    return crud.test_en(db, sentenceid, text)
 
 @app.get("/speak/")
 def speak(text: str, lang: str):
@@ -121,6 +139,22 @@ def speak(text: str, lang: str):
 @app.get("/translate/")
 def trans(text: str, lang: str):
     return crud.translate_text(text, lang)
+
+@app.get("/save_test/")
+def save_test(test: schemas.Test, db: Session = Depends(get_db)):
+    return crud.save_test_of_user(db, test)
+
+@app.get("/history/{userid}")
+def save_test(userid: int, db: Session = Depends(get_db)):
+    return crud.get_history_of_user(db, userid)
+
+@app.get("/sentencecreate/", response_model=schemas.Sentences)
+def create_sentence(sentence: schemas.Sentences, db: Session = Depends(get_db)):
+    return crud.add_sentences(db, sentence)
+
+@app.get("/wordcreate/", response_model=schemas.Word)
+def create_word(word: schemas.Word, db: Session = Depends(get_db)):
+    return crud.add_word(db, word)
 
 # @app.post("/file/")
 # async def convert_audio_to_text(file: UploadFile):
