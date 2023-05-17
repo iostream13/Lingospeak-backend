@@ -3,7 +3,6 @@ googletrans
 greenlet
 mysql
 mysql-connector-python
-mysqlclient
 PyAudio
 pydantic
 pydub
