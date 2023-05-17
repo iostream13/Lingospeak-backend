@@ -1,0 +1,16 @@
+fastapi
+googletrans
+greenlet
+mysql
+mysql-connector-python
+mysqlclient
+PyAudio
+pydantic
+pydub
+pyttsx3
+requests
+SpeechRecognition
+SQLAlchemy
+starlette
+urllib3
+uvicorn

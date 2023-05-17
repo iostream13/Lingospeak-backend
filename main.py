@@ -50,7 +50,7 @@ def get_db():
 def show():
     return "hello"
 
-@app.get("/usercreate/", response_model=schemas.UserCreate)
+@app.post("/usercreate/", response_model=schemas.UserCreate)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_name(db, user_name=user.username)
     if db_user:
@@ -64,7 +64,7 @@ def read_user(user_name: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="user not found")
     return user
 
-@app.get("/update_user/", status_code=status.HTTP_201_CREATED)
+@app.post("/update_user/", status_code=status.HTTP_201_CREATED)
 def update(user: schemas.UserCreate, db: Session = Depends(get_db)):
     if crud.get_user_by_name(db, user.username) is None:
         raise HTTPException(status_code=404, detail="user not found")
