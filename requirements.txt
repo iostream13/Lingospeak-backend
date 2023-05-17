@@ -1,21 +1,16 @@
-git pull
-@"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -InputFormat None -ExecutionPolicy Bypass -Command "[System.Net.ServicePointManager]::SecurityProtocol = 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))" && SET "PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin"
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-choco upgrade chocolatey
-choco install portaudio
-pip3 install fastapi
-pip3 install googletrans
-pip3 install greenlet
-pip3 install mysql
-pip3 install mysql-connector-python
-pip3 install mysqlclient
-pip3 install PyAudio
-pip3 install pydantic
-pip3 install pydub
-pip3 install pyttsx3
-pip3 install requests
-pip3 install SpeechRecognition
-pip3 install SQLAlchemy
-pip3 install starlette
-pip3 install urllib3
-pip3 install uvicorn
+fastapi
+googletrans
+greenlet
+mysql
+mysql-connector-python
+mysqlclient
+PyAudio
+pydantic
+pydub
+pyttsx3
+requests
+SpeechRecognition
+SQLAlchemy
+starlette
+urllib3
+uvicorn
