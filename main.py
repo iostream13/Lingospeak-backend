@@ -3,7 +3,6 @@ import imp
 from lib2to3.pgen2 import token
 from random import random
 from telnetlib import STATUS
-from typing import List
 
 from fastapi import Depends, FastAPI, Query, Body, status, Form, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,7 +11,6 @@ from pydantic import BaseModel, Field
 from fastapi.responses import JSONResponse, PlainTextResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from sqlalchemy.orm import Session
-from typing import Annotated
 from pydub import AudioSegment
 import speech_recognition as sr
 
