@@ -4,7 +4,7 @@ from lib2to3.pgen2 import token
 from random import random
 from telnetlib import STATUS
 
-from fastapi import Depends, FastAPI, Query, Body, status, Form, HTTPException, Request
+from fastapi import Depends, FastAPI, Query, Body, status, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Optional, Set
 from pydantic import BaseModel, Field
@@ -154,12 +154,12 @@ def create_sentence(sentence: schemas.Sentences, db: Session = Depends(get_db)):
 def create_word(word: schemas.Word, db: Session = Depends(get_db)):
     return crud.add_word(db, word)
 
-# @app.post("/file/")
-# async def convert_audio_to_text(file: UploadFile):
-#     audio = AudioSegment.from_file(file.file, format=file.filename.split(".")[-1])
-#     audio.export("temp.wav", format="wav")
-#     recognizer = sr.Recognizer()
-#     with sr.AudioFile("temp.wav") as source:
-#         audio_data = recognizer.record(source)
-#         text = recognizer.recognize_google(audio_data)
-#     return {"text": text}
+@app.post("/file/")
+async def convert_audio_to_text(file: UploadFile):
+    audio = AudioSegment.from_file(file.file, format=file.filename.split(".")[-1])
+    audio.export("temp.wav", format="wav")
+    recognizer = sr.Recognizer()
+    with sr.AudioFile("temp.wav") as source:
+        audio_data = recognizer.record(source)
+        text = recognizer.recognize_google(audio_data)
+    return {"text": text}
