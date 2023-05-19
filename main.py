@@ -112,21 +112,11 @@ def word_by_vi(vietnamese: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="word not found")
     return word
 
-@app.get("/say/")
-def say_sth():
-    text = crud.speech_to_en()
-    if text is None:
-        raise HTTPException(status_code=404, detail="voice is Null")
-    return text
-
-@app.get("/test/en/{sentenceid}")
-def test_en(sentenceid: int, db: Session = Depends(get_db)):
+@app.get("/test/en/")
+def test_en(sentenceid: int, text: str, db: Session = Depends(get_db)):
     sentence = crud.get_sentence_by_id(db, sentenceid)
     if sentence is None:
         raise HTTPException(status_code=404, detail="sentence not found")
-    text = crud.speech_to_en()
-    if text is None:
-        raise HTTPException(status_code=404, detail="voice is Null")
     return crud.test_en(db, sentenceid, text)
 
 @app.get("/speak/")
