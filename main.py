@@ -124,14 +124,39 @@ async def test_en(sentenceid: int, base64_data: str, db: Session = Depends(get_d
     # with sr.AudioFile("temp.wav") as source:
     #     audio_data = recognizer.record(source)
     #     text = recognizer.recognize_google(audio_data)
-    try:
-        binary_data = base64.b64decode(base64_data)
-        # Chuyển đổi dữ liệu nhị phân thành văn bản
-        text = binary_data.decode('utf-8')
-        if text == "practice" or text == "finish" or text == "next" or text == "test" or text == "british" or text == "pines":
-            return {'origin content': "", 'text': text, 'words': "", 'score': ""}
-        return crud.test_en(db, sentenceid, text)
+    base64_data = base64_data.replace("\n", "").replace(" ", "")
     
+    # Kiểm tra số lượng ký tự dữ liệu
+    num_chars = len(base64_data)
+    remainder = num_chars % 4
+    
+    if remainder == 1:
+        # Nếu số lượng ký tự dữ liệu là 1 lớn hơn bội số của 4, hãy thêm padding
+        base64_data += "==="  # Thêm 3 ký tự padding
+    elif remainder == 2:
+        # Nếu số lượng ký tự dữ liệu là 2 lớn hơn bội số của 4, hãy thêm padding
+        base64_data += "=="   # Thêm 2 ký tự padding
+    elif remainder == 3:
+        # Nếu số lượng ký tự dữ liệu là 3 lớn hơn bội số của 4, hãy thêm padding
+        base64_data += "="    # Thêm 1 ký tự padding
+    
+    try:
+        # Giải mã chuỗi base64 thành dữ liệu nhị phân
+        binary_data = base64.b64decode(base64_data)
+        
+        try:
+            # Chuyển đổi dữ liệu nhị phân thành văn bản với mã hóa UTF-8
+            text = binary_data.decode('utf-8')
+            if text == "practice" or text == "finish" or text == "next" or text == "test" or text == "british" or text == "pines":
+                return {'origin content': "", 'text': text, 'words': "", 'score': ""}
+            return crud.test_en(db, sentenceid, text)
+        except UnicodeDecodeError:
+            # Nếu gặp lỗi UnicodeDecodeError, thử với mã hóa latin-1
+            text = binary_data.decode('latin-1')
+            if text == "practice" or text == "finish" or text == "next" or text == "test" or text == "british" or text == "pines":
+                return {'origin content': "", 'text': text, 'words': "", 'score': ""}
+            return crud.test_en(db, sentenceid, text)
+        
     except Exception as e:
         return {"error": str(e)}
     
