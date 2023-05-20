@@ -128,19 +128,19 @@ async def test_en(sentenceid: int, base64_data: str, db: Session = Depends(get_d
     #     text = recognizer.recognize_google(audio_data)
     # base64_data = base64_data.replace("\n", "").replace(" ", "")
     
-    # Kiểm tra số lượng ký tự dữ liệu
-    num_chars = len(base64_data)
-    remainder = num_chars % 4
+    # # Kiểm tra số lượng ký tự dữ liệu
+    # num_chars = len(base64_data)
+    # remainder = num_chars % 4
     
-    if remainder == 1:
-        # Nếu số lượng ký tự dữ liệu là 1 lớn hơn bội số của 4, hãy thêm padding
-        base64_data += "==="  # Thêm 3 ký tự padding
-    elif remainder == 2:
-        # Nếu số lượng ký tự dữ liệu là 2 lớn hơn bội số của 4, hãy thêm padding
-        base64_data += "=="   # Thêm 2 ký tự padding
-    elif remainder == 3:
-        # Nếu số lượng ký tự dữ liệu là 3 lớn hơn bội số của 4, hãy thêm padding
-        base64_data += "="    # Thêm 1 ký tự padding
+    # if remainder == 1:
+    #     # Nếu số lượng ký tự dữ liệu là 1 lớn hơn bội số của 4, hãy thêm padding
+    #     base64_data += "==="  # Thêm 3 ký tự padding
+    # elif remainder == 2:
+    #     # Nếu số lượng ký tự dữ liệu là 2 lớn hơn bội số của 4, hãy thêm padding
+    #     base64_data += "=="   # Thêm 2 ký tự padding
+    # elif remainder == 3:
+    #     # Nếu số lượng ký tự dữ liệu là 3 lớn hơn bội số của 4, hãy thêm padding
+    #     base64_data += "="    # Thêm 1 ký tự padding
     
     binary_data = base64.b64decode(base64_data)
 
