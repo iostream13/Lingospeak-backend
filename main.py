@@ -127,7 +127,7 @@ async def test_en(sentenceid: int, base64_data: str, db: Session = Depends(get_d
     # with sr.AudioFile("temp.wav") as source:
     #     audio_data = recognizer.record(source)
     #     text = recognizer.recognize_google(audio_data)
-    # base64_data = base64_data.replace("\n", "").replace(" ", "")
+    base64_data = base64_data.replace("\n", "").replace(" ", "")
     
     # Kiểm tra số lượng ký tự dữ liệu
     num_chars = len(base64_data)
