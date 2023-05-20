@@ -114,7 +114,7 @@ def word_by_vi(vietnamese: str, db: Session = Depends(get_db)):
     return word
 
 @app.post("/test/en/{sentenceid}")
-async def test_en(sentenceid: int, file: UploadFile, db: Session = Depends(get_db)):
+async def test_en(sentenceid: int, base64_data: str, db: Session = Depends(get_db)):
     sentence = crud.get_sentence_by_id(db, sentenceid)
     if sentence is None:
         raise HTTPException(status_code=404, detail="sentence not found")
@@ -125,10 +125,9 @@ async def test_en(sentenceid: int, file: UploadFile, db: Session = Depends(get_d
     #     audio_data = recognizer.record(source)
     #     text = recognizer.recognize_google(audio_data)
     try:
-        # Đọc dữ liệu âm thanh từ file được tải lên
-        audio_data = await file.read()
-        # Giải mã dữ liệu âm thanh từ base64 sang văn bản
-        text = base64.b64decode(audio_data).decode('utf-8')
+        binary_data = base64.b64decode(base64_data)
+        # Chuyển đổi dữ liệu nhị phân thành văn bản
+        text = binary_data.decode('utf-8')
         if text == "practice" or text == "finish" or text == "next" or text == "test" or text == "british" or text == "pines":
             return {'origin content': "", 'text': text, 'words': "", 'score': ""}
         return crud.test_en(db, sentenceid, text)
