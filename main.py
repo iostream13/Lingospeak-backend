@@ -148,8 +148,9 @@ async def test_en(sentenceid: int, base64_data: str, db: Session = Depends(get_d
         # Tạo một đối tượng io.BytesIO từ dữ liệu nhị phân
         file = open("temp.wav", "wb")
         file.write(binary_data)
+        
         recognizer = sr.Recognizer()
-        audio = AudioSegment.from_file(file.file, format=file.filename.split(".")[-1])
+        audio = AudioSegment.from_file(file)
         audio.export("temp.wav", format="wav")
         recognizer = sr.Recognizer()
         with sr.AudioFile("temp.wav") as source:
