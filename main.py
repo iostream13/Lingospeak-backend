@@ -16,6 +16,7 @@ from pydub import AudioSegment
 import speech_recognition as sr
 import io
 import pydub
+import wave
 
 from sql_app import crud, models, schemas
 from sql_app.database import SessionLocal, engine 
@@ -142,15 +143,18 @@ async def test_en(sentenceid: int, base64_data: str, db: Session = Depends(get_d
     #     # Nếu số lượng ký tự dữ liệu là 3 lớn hơn bội số của 4, hãy thêm padding
     #     base64_data += "="    # Thêm 1 ký tự padding
     
-    binary_data = base64.b64decode(base64_data)
+    audio_data = base64.b64decode(base64_data)
 
-    # Write out to a wav file
-    with open('output.wav', 'wb') as out_file:
-        out_file.write(binary_data)
+    with wave.open("audio.wav", "wb") as wav_file:
+        wav_file.setnchannels(1)  # Số kênh âm thanh (1 cho âm thanh đơn kênh, 2 cho âm thanh stereo)
+        wav_file.setsampwidth(2)  # Kích thước mẫu âm thanh (2 byte cho âm thanh 16-bit)
+        wav_file.setframerate(16000)  # Tần số mẫu âm thanh (16000 mẫu/giây cho giọng nói)
+        wav_file.writeframes(audio_data)
 
+    audio_file = "audio.wav"
     # Use the wav file with speech recognition
     r = sr.Recognizer()
-    with sr.AudioFile('output.wav') as source:
+    with sr.AudioFile(audio_file) as source:
         audio = r.record(source)
     try:
         text = r.recognize_google(audio)
