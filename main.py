@@ -112,11 +112,19 @@ def word_by_vi(vietnamese: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="word not found")
     return word
 
-@app.get("/test/en/")
-def test_en(sentenceid: int, text: str, db: Session = Depends(get_db)):
+@app.post("/test/en/")
+def test_en(sentenceid: int, file: UploadFile, db: Session = Depends(get_db)):
     sentence = crud.get_sentence_by_id(db, sentenceid)
     if sentence is None:
         raise HTTPException(status_code=404, detail="sentence not found")
+    audio = AudioSegment.from_file(file.file, format=file.filename.split(".")[-1])
+    audio.export("temp.wav", format="wav")
+    recognizer = sr.Recognizer()
+    with sr.AudioFile("temp.wav") as source:
+        audio_data = recognizer.record(source)
+        text = recognizer.recognize_google(audio_data)
+    if text == "practice" or text == "finish" or text == "next" or text == "test" or text == "british" or text == "pines":
+        return {'origin content': "", 'text': text, 'words': "", 'score': ""}
     return crud.test_en(db, sentenceid, text)
 
 @app.get("/speak/")
@@ -144,12 +152,3 @@ def create_sentence(sentence: schemas.Sentences, db: Session = Depends(get_db)):
 def create_word(word: schemas.Word, db: Session = Depends(get_db)):
     return crud.add_word(db, word)
 
-@app.post("/file/")
-async def convert_audio_to_text(file: UploadFile):
-    audio = AudioSegment.from_file(file.file, format=file.filename.split(".")[-1])
-    audio.export("temp.wav", format="wav")
-    recognizer = sr.Recognizer()
-    with sr.AudioFile("temp.wav") as source:
-        audio_data = recognizer.record(source)
-        text = recognizer.recognize_google(audio_data)
-    return {"text": text}
