@@ -126,7 +126,7 @@ async def test_en(sentenceid: int, base64_data: str, db: Session = Depends(get_d
     # with sr.AudioFile("temp.wav") as source:
     #     audio_data = recognizer.record(source)
     #     text = recognizer.recognize_google(audio_data)
-    base64_data = base64_data.replace("\n", "").replace(" ", "")
+    # base64_data = base64_data.replace("\n", "").replace(" ", "")
     
     # Kiểm tra số lượng ký tự dữ liệu
     num_chars = len(base64_data)
@@ -142,28 +142,25 @@ async def test_en(sentenceid: int, base64_data: str, db: Session = Depends(get_d
         # Nếu số lượng ký tự dữ liệu là 3 lớn hơn bội số của 4, hãy thêm padding
         base64_data += "="    # Thêm 1 ký tự padding
     
+    binary_data = base64.b64decode(base64_data)
+
+    # Write out to a wav file
+    with open('output.wav', 'wb') as out_file:
+        out_file.write(binary_data)
+
+    # Use the wav file with speech recognition
+    r = sr.Recognizer()
+    with sr.AudioFile('output.wav') as source:
+        audio = r.record(source)
     try:
-        # Giải mã chuỗi base64 thành dữ liệu nhị phân
-        binary_data = base64.b64decode(base64_data)
-        # Tạo một đối tượng io.BytesIO từ dữ liệu nhị phân
-        file = open("temp.wav", "wb")
-        file.write(binary_data)
-        
-        recognizer = sr.Recognizer()
-        audio = AudioSegment.from_file(file)
-        audio.export("temp.wav", format="wav")
-        recognizer = sr.Recognizer()
-        with sr.AudioFile("temp.wav") as source:
-            audio_data = recognizer.record(source)
-            text = recognizer.recognize_google(audio_data)
+        text = r.recognize_google(audio)
         if text == "practice" or text == "finish" or text == "next" or text == "test" or text == "british" or text == "pines":
             return {'origin content': "", 'text': text, 'words': "", 'score': ""}
         return crud.test_en(db, sentenceid, text)
-        
-    except Exception as e:
+    except sr.UnknownValueError:
         return {"error": str(e)}
-    
-    
+    except sr.RequestError as e:
+        return {"error": str(e)}  
 
 @app.get("/speak/")
 def speak(text: str, lang: str):
