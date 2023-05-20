@@ -112,9 +112,8 @@ def word_by_vi(vietnamese: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="word not found")
     return word
 
-@app.post("/test/en/")
-def test_en(sentenceid: str, file: UploadFile, db: Session = Depends(get_db)):
-    sentenceid = int(sentenceid)
+@app.post("/test/en/{sentenceid}")
+def test_en(sentenceid: int, file: UploadFile, db: Session = Depends(get_db)):
     sentence = crud.get_sentence_by_id(db, sentenceid)
     if sentence is None:
         raise HTTPException(status_code=404, detail="sentence not found")
