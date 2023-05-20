@@ -146,11 +146,15 @@ async def test_en(sentenceid: int, base64_data: str, db: Session = Depends(get_d
         # Giải mã chuỗi base64 thành dữ liệu nhị phân
         binary_data = base64.b64decode(base64_data)
         # Tạo một đối tượng io.BytesIO từ dữ liệu nhị phân
-        audio_stream = io.BytesIO(binary_data)
+        file = open("temp.wav", "wb")
+        file.write(binary_data)
         recognizer = sr.Recognizer()
-        with sr.AudioFile(audio_stream) as source:
-            audio = recognizer.record(source)        
-        text = recognizer.recognize_google(audio)
+        audio = AudioSegment.from_file(file.file, format=file.filename.split(".")[-1])
+        audio.export("temp.wav", format="wav")
+        recognizer = sr.Recognizer()
+        with sr.AudioFile("temp.wav") as source:
+            audio_data = recognizer.record(source)
+            text = recognizer.recognize_google(audio_data)
         if text == "practice" or text == "finish" or text == "next" or text == "test" or text == "british" or text == "pines":
             return {'origin content': "", 'text': text, 'words': "", 'score': ""}
         return crud.test_en(db, sentenceid, text)
