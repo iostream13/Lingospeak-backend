@@ -14,6 +14,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from sqlalchemy.orm import Session
 from pydub import AudioSegment
 import speech_recognition as sr
+import io
 
 from sql_app import crud, models, schemas
 from sql_app.database import SessionLocal, engine 
@@ -143,19 +144,19 @@ async def test_en(sentenceid: int, base64_data: str, db: Session = Depends(get_d
     try:
         # Giải mã chuỗi base64 thành dữ liệu nhị phân
         binary_data = base64.b64decode(base64_data)
+        # Tạo một đối tượng io.BytesIO từ dữ liệu nhị phân
+        audio_stream = io.BytesIO(binary_data)
+        recognizer = sr.Recognizer()
         
-        try:
-            # Chuyển đổi dữ liệu nhị phân thành văn bản với mã hóa UTF-8
-            text = binary_data.decode('utf-8')
-            if text == "practice" or text == "finish" or text == "next" or text == "test" or text == "british" or text == "pines":
-                return {'origin content': "", 'text': text, 'words': "", 'score': ""}
-            return crud.test_en(db, sentenceid, text)
-        except UnicodeDecodeError:
-            # Nếu gặp lỗi UnicodeDecodeError, thử với mã hóa latin-1
-            text = binary_data.decode('latin-1')
-            if text == "practice" or text == "finish" or text == "next" or text == "test" or text == "british" or text == "pines":
-                return {'origin content': "", 'text': text, 'words': "", 'score': ""}
-            return crud.test_en(db, sentenceid, text)
+        # Đọc dữ liệu âm thanh từ đối tượng audio stream
+        with sr.AudioFile(audio_stream) as source:
+            audio = recognizer.record(source)
+        
+        # Chuyển đổi âm thanh thành văn bản bằng recognizer
+        text = recognizer.recognize_google(audio)
+        if text == "practice" or text == "finish" or text == "next" or text == "test" or text == "british" or text == "pines":
+            return {'origin content': "", 'text': text, 'words': "", 'score': ""}
+        return crud.test_en(db, sentenceid, text)
         
     except Exception as e:
         return {"error": str(e)}
