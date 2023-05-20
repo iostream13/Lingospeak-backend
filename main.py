@@ -1,3 +1,4 @@
+import base64
 import email
 import imp
 from lib2to3.pgen2 import token
@@ -113,19 +114,29 @@ def word_by_vi(vietnamese: str, db: Session = Depends(get_db)):
     return word
 
 @app.post("/test/en/{sentenceid}")
-def test_en(sentenceid: int, file: UploadFile, db: Session = Depends(get_db)):
+async def test_en(sentenceid: int, file: UploadFile, db: Session = Depends(get_db)):
     sentence = crud.get_sentence_by_id(db, sentenceid)
     if sentence is None:
         raise HTTPException(status_code=404, detail="sentence not found")
-    audio = AudioSegment.from_file(file.file, format=file.filename.split(".")[-1])
-    audio.export("temp.wav", format="wav")
-    recognizer = sr.Recognizer()
-    with sr.AudioFile("temp.wav") as source:
-        audio_data = recognizer.record(source)
-        text = recognizer.recognize_google(audio_data)
-    if text == "practice" or text == "finish" or text == "next" or text == "test" or text == "british" or text == "pines":
-        return {'origin content': "", 'text': text, 'words': "", 'score': ""}
-    return crud.test_en(db, sentenceid, text)
+    # audio = AudioSegment.from_file(file.file, format=file.filename.split(".")[-1])
+    # audio.export("temp.wav", format="wav")
+    # recognizer = sr.Recognizer()
+    # with sr.AudioFile("temp.wav") as source:
+    #     audio_data = recognizer.record(source)
+    #     text = recognizer.recognize_google(audio_data)
+    try:
+        # Đọc dữ liệu âm thanh từ file được tải lên
+        audio_data = await file.read()
+        # Giải mã dữ liệu âm thanh từ base64 sang văn bản
+        text = base64.b64decode(audio_data).decode('utf-8')
+        if text == "practice" or text == "finish" or text == "next" or text == "test" or text == "british" or text == "pines":
+            return {'origin content': "", 'text': text, 'words': "", 'score': ""}
+        return crud.test_en(db, sentenceid, text)
+    
+    except Exception as e:
+        return {"error": str(e)}
+    
+    
 
 @app.get("/speak/")
 def speak(text: str, lang: str):
