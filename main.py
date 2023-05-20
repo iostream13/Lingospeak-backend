@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 from pydub import AudioSegment
 import speech_recognition as sr
 import io
+import pydub
 
 from sql_app import crud, models, schemas
 from sql_app.database import SessionLocal, engine 
@@ -146,13 +147,15 @@ async def test_en(sentenceid: int, base64_data: str, db: Session = Depends(get_d
         binary_data = base64.b64decode(base64_data)
         # Tạo một đối tượng io.BytesIO từ dữ liệu nhị phân
         audio_stream = io.BytesIO(binary_data)
+        wav_file = "audio.wav"
+        with open(wav_file, "wb") as f:
+            f.write(binary_data)
+        
+        # Mở tệp WAV và chuyển đổi sang định dạng AudioSegment
+        audio = pydub.AudioSegment.from_wav(wav_file)
+
         recognizer = sr.Recognizer()
         
-        # Đọc dữ liệu âm thanh từ đối tượng audio stream
-        with sr.AudioFile(audio_stream) as source:
-            audio = recognizer.record(source)
-        
-        # Chuyển đổi âm thanh thành văn bản bằng recognizer
         text = recognizer.recognize_google(audio)
         if text == "practice" or text == "finish" or text == "next" or text == "test" or text == "british" or text == "pines":
             return {'origin content': "", 'text': text, 'words': "", 'score': ""}
