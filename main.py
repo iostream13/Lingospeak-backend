@@ -161,10 +161,9 @@ async def test_en(sentenceid: int, base64_data: str, db: Session = Depends(get_d
         if text == "practice" or text == "finish" or text == "next" or text == "test" or text == "british" or text == "pines":
             return {'origin content': "", 'text': text, 'words': "", 'score': ""}
         return crud.test_en(db, sentenceid, text)
-    except sr.UnknownValueError:
+    except Exception as e:
         return {"error": str(e)}
-    except sr.RequestError as e:
-        return {"error": str(e)}  
+
 
 @app.get("/speak/")
 def speak(text: str, lang: str):
