@@ -156,7 +156,7 @@ async def test_en(sentenceid: int, base64_data: str, db: Session = Depends(get_d
     r = sr.Recognizer()
     with sr.AudioFile(audio_file) as source:
         audio = r.record(source)
-    text = r.recognize_google(audio)
+    text = r.recognize_google(audio, language = 'en-IN', show_all = True )
     if text == "practice" or text == "finish" or text == "next" or text == "test" or text == "british" or text == "pines":
         return {'origin content': "", 'text': text, 'words': "", 'score': ""}
     return crud.test_en(db, sentenceid, text)
