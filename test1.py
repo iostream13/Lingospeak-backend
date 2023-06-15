@@ -15,5 +15,5 @@ def print_file_content(file_path):
         text = recognizer.recognize_google(audio_data)
         print(text)
             
-file_path = "uni.mp3"
+file_path = "ls.mp3"
 print_file_content(file_path)
