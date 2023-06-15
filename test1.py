@@ -3,9 +3,9 @@ from pydub import AudioSegment
 import speech_recognition as sr
 
 import pyttsx3
-res = ""
-def split_audio_and_transcribe(audio_file_path, chunk_duration_ms):
 
+def split_audio_and_transcribe(audio_file_path, chunk_duration_ms):
+    res = ""
     audio = AudioSegment.from_file(audio_file_path)
     total_duration = len(audio)
     start_time = 0
@@ -40,8 +40,9 @@ def split_audio_and_transcribe(audio_file_path, chunk_duration_ms):
                 res = res + " " + text
         except sr.UnknownValueError:
             pass
+    return res
 audio_file_path = "ls.mp3"
 chunk_duration_ms = 10000
-split_audio_and_transcribe(audio_file_path, chunk_duration_ms)
-print(res)
+print(split_audio_and_transcribe(audio_file_path, chunk_duration_ms))
+
 
