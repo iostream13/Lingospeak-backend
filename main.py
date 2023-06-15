@@ -48,106 +48,106 @@ def get_db():
 def show():
     return "hello"
 
-# @app.post("/usercreate/", response_model=schemas.UserCreate)
-# def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-#     db_user = crud.get_user_by_name(db, user_name=user.username)
-#     if db_user:
-#         raise HTTPException(status_code=400, detail="username already registered")
-#     return crud.create_user(db, user)
+@app.post("/usercreate/", response_model=schemas.UserCreate)
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    db_user = crud.get_user_by_name(db, user_name=user.username)
+    if db_user:
+        raise HTTPException(status_code=400, detail="username already registered")
+    return crud.create_user(db, user)
 
-# @app.get("/user/{user_name}")
-# def read_user(user_name: str, db: Session = Depends(get_db)):
-#     user = crud.get_user_by_name(db, user_name)
-#     if user is None:
-#         raise HTTPException(status_code=404, detail="user not found")
-#     return user
+@app.get("/user/{user_name}")
+def read_user(user_name: str, db: Session = Depends(get_db)):
+    user = crud.get_user_by_name(db, user_name)
+    if user is None:
+        raise HTTPException(status_code=404, detail="user not found")
+    return user
 
-# @app.post("/update_user/", status_code=status.HTTP_201_CREATED)
-# def update(user: schemas.UserCreate, db: Session = Depends(get_db)):
-#     if crud.get_user_by_name(db, user.username) is None:
-#         raise HTTPException(status_code=404, detail="user not found")
-#         return None
-#     user_update = crud.update_user(db, user)
-#     return user_update
+@app.post("/update_user/", status_code=status.HTTP_201_CREATED)
+def update(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    if crud.get_user_by_name(db, user.username) is None:
+        raise HTTPException(status_code=404, detail="user not found")
+        return None
+    user_update = crud.update_user(db, user)
+    return user_update
 
-# @app.get("/sentence/{sentenceid}")
-# def sentence_by_id(sentenceid: int, db: Session = Depends(get_db)):
-#     sentence = crud.get_sentence_by_id(db, sentenceid)
-#     if sentence is None:
-#         raise HTTPException(status_code=404, detail="sentence not found")
-#     return sentence
+@app.get("/sentence/{sentenceid}")
+def sentence_by_id(sentenceid: int, db: Session = Depends(get_db)):
+    sentence = crud.get_sentence_by_id(db, sentenceid)
+    if sentence is None:
+        raise HTTPException(status_code=404, detail="sentence not found")
+    return sentence
 
-# @app.get("/sentences/cefr_tags/")
-# def sentences_by_cefr_tags(cefr_tags: str, db: Session = Depends(get_db)):
-#     sentences = crud.get_list_sentences_by_cefr_tags(db, cefr_tags)
-#     if sentences is None:
-#         raise HTTPException(status_code=404, detail="cefr tags not found")
-#     return sentences
+@app.get("/sentences/cefr_tags/")
+def sentences_by_cefr_tags(cefr_tags: str, db: Session = Depends(get_db)):
+    sentences = crud.get_list_sentences_by_cefr_tags(db, cefr_tags)
+    if sentences is None:
+        raise HTTPException(status_code=404, detail="cefr tags not found")
+    return sentences
 
-# @app.get("/sentences/domain_tags/")
-# def sentences_by_domain_tags(domain_tags: str, db: Session = Depends(get_db)):
-#     sentences = crud.get_list_sentences_by_domain_tags(db, domain_tags)
-#     if sentences is None:
-#         raise HTTPException(status_code=404, detail="domain tags not found")
-#     return sentences
+@app.get("/sentences/domain_tags/")
+def sentences_by_domain_tags(domain_tags: str, db: Session = Depends(get_db)):
+    sentences = crud.get_list_sentences_by_domain_tags(db, domain_tags)
+    if sentences is None:
+        raise HTTPException(status_code=404, detail="domain tags not found")
+    return sentences
 
-# @app.get("/sentences/tags/")
-# def sentences_by_cefr_and_domain_tags(cefr_tags: str, domain_tags: str, db: Session = Depends(get_db)):
-#     sentences = crud.get_list_sentences_by_cefr_and_domain_tags(db, cefr_tags, domain_tags)
-#     if sentences is None:
-#         raise HTTPException(status_code=404, detail="tags not found")
-#     return sentences
+@app.get("/sentences/tags/")
+def sentences_by_cefr_and_domain_tags(cefr_tags: str, domain_tags: str, db: Session = Depends(get_db)):
+    sentences = crud.get_list_sentences_by_cefr_and_domain_tags(db, cefr_tags, domain_tags)
+    if sentences is None:
+        raise HTTPException(status_code=404, detail="tags not found")
+    return sentences
 
-# @app.get("/word/en/")
-# def word_by_en(english: str, db: Session = Depends(get_db)):
-#     word = crud.get_word_by_english(db, english)
-#     if word is None:
-#         raise HTTPException(status_code=404, detail="word not found")
-#     return word
+@app.get("/word/en/")
+def word_by_en(english: str, db: Session = Depends(get_db)):
+    word = crud.get_word_by_english(db, english)
+    if word is None:
+        raise HTTPException(status_code=404, detail="word not found")
+    return word
 
-# @app.get("/word/vi/")
-# def word_by_vi(vietnamese: str, db: Session = Depends(get_db)):
-#     word = crud.get_word_by_vietnamese(db, vietnamese)
-#     if word is None:
-#         raise HTTPException(status_code=404, detail="word not found")
-#     return word
+@app.get("/word/vi/")
+def word_by_vi(vietnamese: str, db: Session = Depends(get_db)):
+    word = crud.get_word_by_vietnamese(db, vietnamese)
+    if word is None:
+        raise HTTPException(status_code=404, detail="word not found")
+    return word
 
-# @app.post("/test/en/{sentenceid}")
-# def test_en(sentenceid: int, file: UploadFile, db: Session = Depends(get_db)):
-#     sentence = crud.get_sentence_by_id(db, sentenceid)
-#     if sentence is None:
-#         raise HTTPException(status_code=404, detail="sentence not found")
-#     audio = AudioSegment.from_file(file.file, format=file.filename.split(".")[-1])
-#     audio.export("temp.wav", format="wav")
-#     recognizer = sr.Recognizer()
-#     with sr.AudioFile("temp.wav") as source:
-#         audio_data = recognizer.record(source)
-#         text = recognizer.recognize_google(audio_data)
-#     if text == "practice" or text == "finish" or text == "next" or text == "test" or text == "british" or text == "pines":
-#         return {'origin content': "", 'text': text, 'words': "", 'score': ""}
-#     return crud.test_en(db, sentenceid, text)
+@app.post("/test/en/{sentenceid}")
+def test_en(sentenceid: int, file: UploadFile, db: Session = Depends(get_db)):
+    sentence = crud.get_sentence_by_id(db, sentenceid)
+    if sentence is None:
+        raise HTTPException(status_code=404, detail="sentence not found")
+    audio = AudioSegment.from_file(file.file, format=file.filename.split(".")[-1])
+    audio.export("temp.wav", format="wav")
+    recognizer = sr.Recognizer()
+    with sr.AudioFile("temp.wav") as source:
+        audio_data = recognizer.record(source)
+        text = recognizer.recognize_google(audio_data)
+    if text == "practice" or text == "finish" or text == "next" or text == "test" or text == "british" or text == "pines":
+        return {'origin content': "", 'text': text, 'words': "", 'score': ""}
+    return crud.test_en(db, sentenceid, text)
 
-# @app.get("/speak/")
-# def speak(text: str, lang: str):
-#     crud.SpeakText(text, lang)
-#     return "ok"
+@app.get("/speak/")
+def speak(text: str, lang: str):
+    crud.SpeakText(text, lang)
+    return "ok"
 
-# @app.get("/translate/")
-# def trans(text: str, lang: str):
-#     return crud.translate_text(text, lang)
+@app.get("/translate/")
+def trans(text: str, lang: str):
+    return crud.translate_text(text, lang)
 
-# @app.get("/save_test/")
-# def save_test(test: schemas.Test, db: Session = Depends(get_db)):
-#     return crud.save_test_of_user(db, test)
+@app.get("/save_test/")
+def save_test(test: schemas.Test, db: Session = Depends(get_db)):
+    return crud.save_test_of_user(db, test)
 
-# @app.get("/history/{userid}")
-# def save_test(userid: int, db: Session = Depends(get_db)):
-#     return crud.get_history_of_user(db, userid)
+@app.get("/history/{userid}")
+def save_test(userid: int, db: Session = Depends(get_db)):
+    return crud.get_history_of_user(db, userid)
 
-# @app.get("/sentencecreate/", response_model=schemas.Sentences)
-# def create_sentence(sentence: schemas.Sentences, db: Session = Depends(get_db)):
-#     return crud.add_sentences(db, sentence)
+@app.get("/sentencecreate/", response_model=schemas.Sentences)
+def create_sentence(sentence: schemas.Sentences, db: Session = Depends(get_db)):
+    return crud.add_sentences(db, sentence)
 
-# @app.get("/wordcreate/", response_model=schemas.Word)
-# def create_word(word: schemas.Word, db: Session = Depends(get_db)):
-#     return crud.add_word(db, word)
+@app.get("/wordcreate/", response_model=schemas.Word)
+def create_word(word: schemas.Word, db: Session = Depends(get_db)):
+    return crud.add_word(db, word)
