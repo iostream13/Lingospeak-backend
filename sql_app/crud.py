@@ -209,4 +209,3 @@ def add_word(db: Session, word: schemas.Word):
     db.commit()
     db.refresh(db_word)
     return db_word
-

@@ -1,4 +1,3 @@
-import base64
 import email
 import imp
 from lib2to3.pgen2 import token
@@ -14,9 +13,6 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from sqlalchemy.orm import Session
 from pydub import AudioSegment
 import speech_recognition as sr
-import io
-import pydub
-import wave
 
 from sql_app import crud, models, schemas
 from sql_app.database import SessionLocal, engine 
@@ -116,59 +112,6 @@ def word_by_vi(vietnamese: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="word not found")
     return word
 
-# @app.post("/test/en/{sentenceid}")
-# async def test_en(sentenceid: int, base64_data: str, db: Session = Depends(get_db)):
-#     sentence = crud.get_sentence_by_id(db, sentenceid)
-#     if sentence is None:
-#         raise HTTPException(status_code=404, detail="sentence not found")
-#     # audio = AudioSegment.from_file(file.file, format=file.filename.split(".")[-1])
-#     # audio.export("temp.wav", format="wav")
-#     # recognizer = sr.Recognizer()
-#     # with sr.AudioFile("temp.wav") as source:
-#     #     audio_data = recognizer.record(source)
-#     #     text = recognizer.recognize_google(audio_data)
-#     base64_data = base64_data.replace("\n", "").replace(" ", "")
-    
-#     # Kiểm tra số lượng ký tự dữ liệu
-#     num_chars = len(base64_data)
-#     remainder = num_chars % 4
-    
-#     if remainder == 1:
-#         # Nếu số lượng ký tự dữ liệu là 1 lớn hơn bội số của 4, hãy thêm padding
-#         base64_data += "==="  # Thêm 3 ký tự padding
-#     elif remainder == 2:
-#         # Nếu số lượng ký tự dữ liệu là 2 lớn hơn bội số của 4, hãy thêm padding
-#         base64_data += "=="   # Thêm 2 ký tự padding
-#     elif remainder == 3:
-#         # Nếu số lượng ký tự dữ liệu là 3 lớn hơn bội số của 4, hãy thêm padding
-#         base64_data += "="    # Thêm 1 ký tự padding
-    
-#     audio_data = base64.b64decode(base64_data)
-
-#     with wave.open("audio.wav", "wb") as wav_file:
-#         wav_file.setnchannels(1)  # Số kênh âm thanh (1 cho âm thanh đơn kênh, 2 cho âm thanh stereo)
-#         wav_file.setsampwidth(2)  # Kích thước mẫu âm thanh (2 byte cho âm thanh 16-bit)
-#         wav_file.setframerate(16000)  # Tần số mẫu âm thanh (16000 mẫu/giây cho giọng nói)
-#         wav_file.writeframes(audio_data)
-
-#     audio_file = "audio.wav"
-#     # Use the wav file with speech recognition
-#     r = sr.Recognizer()
-#     with sr.AudioFile(audio_file) as source:
-#         audio = r.record(source)
-#     text = r.recognize_google(audio, language = 'en-IN', show_all = True )
-#     return text
-    # if text == "practice" or text == "finish" or text == "next" or text == "test" or text == "british" or text == "pines":
-    #     return {'origin content': "", 'text': text, 'words': "", 'score': ""}
-    # return crud.test_en(db, sentenceid, text)
-    # try:
-    #     text = r.recognize_google(audio)
-    #     if text == "practice" or text == "finish" or text == "next" or text == "test" or text == "british" or text == "pines":
-    #         return {'origin content': "", 'text': text, 'words': "", 'score': ""}
-    #     return crud.test_en(db, sentenceid, text)
-    # except Exception as e:
-    #     return {"error": str(e)}
-    
 @app.post("/test/en/{sentenceid}")
 def test_en(sentenceid: int, file: UploadFile, db: Session = Depends(get_db)):
     sentence = crud.get_sentence_by_id(db, sentenceid)
@@ -183,7 +126,6 @@ def test_en(sentenceid: int, file: UploadFile, db: Session = Depends(get_db)):
     if text == "practice" or text == "finish" or text == "next" or text == "test" or text == "british" or text == "pines":
         return {'origin content': "", 'text': text, 'words': "", 'score': ""}
     return crud.test_en(db, sentenceid, text)
-
 
 @app.get("/speak/")
 def speak(text: str, lang: str):
@@ -209,4 +151,3 @@ def create_sentence(sentence: schemas.Sentences, db: Session = Depends(get_db)):
 @app.get("/wordcreate/", response_model=schemas.Word)
 def create_word(word: schemas.Word, db: Session = Depends(get_db)):
     return crud.add_word(db, word)
-
