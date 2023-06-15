@@ -16,10 +16,13 @@ def split_audio_and_transcribe(audio_file_path, chunk_duration_ms):
         chunk.export("temp.wav", format="wav")
 
         recognizer = sr.Recognizer()
-        with sr.AudioFile("temp.wav") as source:
-            audio_data = recognizer.record(source)
-            text = recognizer.recognize_google(audio_data)
-            res = res + " " + text
+        try:
+            with sr.AudioFile("temp.wav") as source:
+                audio_data = recognizer.record(source)
+                text = recognizer.recognize_google(audio_data)
+                res = res + " " + text
+        except sr.UnknownValueError:
+            pass
 
         start_time = end_time
         end_time += chunk_duration_ms
@@ -30,10 +33,13 @@ def split_audio_and_transcribe(audio_file_path, chunk_duration_ms):
         chunk.export("temp.wav", format="wav")
 
         recognizer = sr.Recognizer()
-        with sr.AudioFile("temp.wav") as source:
-            audio_data = recognizer.record(source)
-            text = recognizer.recognize_google(audio_data)
-            res = res + " " + text
+        try:
+            with sr.AudioFile("temp.wav") as source:
+                audio_data = recognizer.record(source)
+                text = recognizer.recognize_google(audio_data)
+                res = res + " " + text
+        except sr.UnknownValueError:
+            pass
 audio_file_path = "ls.mp3"
 chunk_duration_ms = 10000
 split_audio_and_transcribe(audio_file_path, chunk_duration_ms)
